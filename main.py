@@ -1,6 +1,7 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random 
+from perlin import PerlinNoise
 
 app = Ursina()
 
@@ -35,7 +36,6 @@ hand = Entity(
 )
 
 def update_hotbar():
-    # Remove previous hotbar items
     for e in camera.ui.children[:]:
         if hasattr(e, 'is_hotbar_item') and e.is_hotbar_item:
             destroy(e)
@@ -65,6 +65,8 @@ def input(key):
             hand.texture = blocks[block_id]
             print(hotbar)
             update_hotbar()
+    if key == 'q':
+        application.quit()
 
 
 def update():
@@ -73,6 +75,7 @@ def update():
         hand.position = Vec2(0.4, -0.5)
     else:
         hand.position = Vec2(0.6, -0.6)
+    update_chunks()
 
 class Voxel(Button):
     def __init__(self, position=(0,0,0), texture=blocks[0]):
@@ -95,16 +98,61 @@ class Voxel(Button):
             elif key == 'right mouse down':
                 destroy(self)
 
-for z in range(16):
-    for x in range (16):
-        voxel = Voxel(position=(x,0,z)) #random.randrange(0,2)
+# --- Chunked Terrain Generation ---
+CHUNK_SIZE = 8
+RENDER_DISTANCE = 1  # in chunks (so 5x5 chunks loaded around player)
+MAX_HEIGHT = 10
+perlin = PerlinNoise(seed=42)
 
+loaded_chunks = {}
+
+def chunk_key(x, z):
+    return (x // CHUNK_SIZE, z // CHUNK_SIZE)
+
+def generate_chunk(cx, cz):
+    if (cx, cz) in loaded_chunks:
+        return
+    voxels = []
+    for x in range(cx * CHUNK_SIZE, (cx + 1) * CHUNK_SIZE):
+        for z in range(cz * CHUNK_SIZE, (cz + 1) * CHUNK_SIZE):
+            height = int((perlin.noise(x * 0.1, z * 0.1) + 1) * (MAX_HEIGHT // 2))
+            for y in range(height):
+                Voxel(position=(x, y, z))
+    loaded_chunks[(cx, cz)] = voxels
+
+def unload_far_chunks(player_cx, player_cz):
+    to_unload = []
+    for (cx, cz) in loaded_chunks:
+        if abs(cx - player_cx) > RENDER_DISTANCE or abs(cz - player_cz) > RENDER_DISTANCE:
+            to_unload.append((cx, cz))
+    for key in to_unload:
+        for v in loaded_chunks[key]:
+            destroy(v)
+        del loaded_chunks[key]
+
+def update_chunks():
+    px, pz = int(player.x), int(player.z)
+    pcx, pcz = px // CHUNK_SIZE, pz // CHUNK_SIZE
+    # Load nearby chunks
+    for dx in range(-RENDER_DISTANCE, RENDER_DISTANCE + 1):
+        for dz in range(-RENDER_DISTANCE, RENDER_DISTANCE + 1):
+            generate_chunk(pcx + dx, pcz + dz)
+    # Unload far chunks
+    unload_far_chunks(pcx, pcz)
+
+# Center player spawn
+center_x = 0
+center_z = 0
+center_y = int((perlin.noise(center_x * 0.1, center_z * 0.1) + 1) * (MAX_HEIGHT // 2)) + 3
 player = FirstPersonController()
+player.position = (center_x, center_y, center_z)
 
 player.gravity = 0.5
 player.mouse_sensitivity = Vec2(40, 40)
 player.jump_height = 2.5
 player.speed = 6
 player.jump_up_duration = 0.3
+
+update_chunks()
 
 app.run()
