@@ -13,11 +13,33 @@
     </div>
     <div class="hero h-[calc(100vh-4rem)] text-7xl flex flex-col gap-[50px] items-center justify-center text-center">
         <h1>A <span class="text-[#ec3750] font-6xl cursor-pointer">Minecraft</span> Look-Alike <br> Made In <span class="text-[#ec3750] font-6xl cursor-pointer">Python & Ursina Engine</span></h1>
-        <button class="p-4 rounded-lg bg-[#ec3750] text-white outline-none px-7 flex items-center justify-center gap-2 border-none cursor-pointer text-2xl">
+        <button onclick="window.location.href = '/hackcraft.zip'; setTimeout(() => {console.log('After 0.5 seconds');}, 500); window.location.href = '#info';" class="p-4 rounded-lg bg-[#ec3750] text-white outline-none px-7 flex items-center justify-center gap-2 border-none cursor-pointer text-2xl">
             <span class="material-symbols-outlined">download</span>
             <h1 class="mb-2">Download Now</h1>
         </button>
     </div>
+    <div id="info" class="hero pb-20px text-7xl flex flex-col gap-[50px] items-center justify-center text-center">
+        <h1 class="text-[#ec3750]">Download Instructions</h1>
+        <div class="container p-5 justify-center items-center flex flex-col gap-5">
+            <ul class="text-4xl text-left list-disc list-inside">
+                <li>Unzip the downloaded .zip file</li>
+                <li>Open the folder in your command prompt</li>
+                <li>Make sure you have Python installed</li>
+                <li>Run by typing - <code>python main.py</code></li>
+            </ul>
+        </div>
+        <h1 class="text-[#ec3750] mt-5">How To Play?</h1>
+        <div class="container mb-20 justify-center items-center flex flex-col gap-5">
+            <ul class="text-4xl text-left list-disc list-inside">
+                <li>WASD to move, Spacebar to jump</li>
+                <li>Right click to break, Left click to place</li>
+                <li>1-4 to change selected item from hotbar</li>
+                <li>If you're stuck in a block press Spacebar</li>
+                <li>Press Q to quit</li>
+            </ul>
+        </div>
+    </div>
+
     <style>
          @font-face {
             font-family: 'Minecraft'; /* Choose a descriptive name for your font */

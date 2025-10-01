@@ -1,3 +1,10 @@
+import pip
+try:
+    from ursina import *
+except Exception as e:
+    print("Ursina is not installed. Installing Ursina via pip...")
+    pip.main(['install', 'ursina'])
+
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 import random 
