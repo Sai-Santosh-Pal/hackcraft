@@ -93,9 +93,9 @@ class Voxel(Button):
     def input(self, key):
         # update_hotbar()
         if self.hovered:
-            if key == 'left mouse down':
+            if key == 'right mouse down':
                 Voxel(position=self.position + mouse.normal, texture=blocks[block_id])
-            elif key == 'right mouse down':
+            elif key == 'left mouse down':
                 destroy(self)
 
 # --- Chunked Terrain Generation ---
